@@ -9,12 +9,18 @@ class Vector_Expression;
 
 
 // type trait to extract the underlying arithmetic type
-template<typename T>
+template<typename T, typename Enable = void>
 struct arithmetic_type
 {
     using type = std::conditional_t<std::is_base_of_v<Vector_Expression<T>, T>, 
-                                     typename T::value_type,
-                                     std::conditional_t<std::is_arithmetic_v<T>, T, void>>;
+                                    typename T::value_type,
+                                    void>;
+};
+
+template<typename T>
+struct arithmetic_type<T, typename std::enable_if_t<std::is_arithmetic_v<T>>>
+{
+    using type = T;
 };
 
 template<typename T, size_t Size>
