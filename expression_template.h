@@ -33,6 +33,7 @@ private:
     BinaryOperator bop;
 };
 
+
 /* Vector Sum */
 template <typename V1, typename V2>
 constexpr auto operator+(const V1& x, const V2& y)

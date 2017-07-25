@@ -1,6 +1,5 @@
 #pragma once
 
-
 // forward declarations
 template<typename T, size_t Size>
 class Vector;
@@ -10,10 +9,12 @@ class Vector_Expression;
 
 
 // type trait to extract the underlying arithmetic type
-template <typename T>
+template<typename T>
 struct arithmetic_type
 {
-    using type = T;
+    using type = std::conditional_t<std::is_base_of_v<Vector_Expression<T>, T>, 
+                                     typename T::value_type,
+                                     std::conditional_t<std::is_arithmetic_v<T>, T, void>>;
 };
 
 template<typename T, size_t Size>
@@ -23,24 +24,15 @@ struct arithmetic_type<Vector<T, Size>>
 };
 
 template<typename T>
-struct arithmetic_type<Vector_Expression<T>>
-{
-    using type = typename Vector_Expression<T>::value_type;
-};
-
-template<typename T>
 using arithmetic_type_t = typename arithmetic_type<T>::type;
 
 
 // is a type vector-like?
-template <typename T>
-struct is_vector : std::false_type { };
+template<typename T>
+struct is_vector : std::is_base_of<Vector_Expression<T>, T> { };
 
 template<typename T, size_t Size>
 struct is_vector<Vector<T, Size>> : std::true_type { };
-
-template<typename T>
-struct is_vector<Vector_Expression<T>> : std::true_type { };
 
 template <typename T>
 struct is_vector<const T> : is_vector<T> {};
